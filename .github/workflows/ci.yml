@@ -1,0 +1,38 @@
+name: Simple CI/CD
+
+on:
+  push:
+    branches: 
+      - main
+  pull_request:
+    branches:
+      - main    
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build backend
+        run: docker build -t backend ./backend
+
+      - name: Build frontend
+        run: docker build -t frontend ./frontend
+
+      - name: Run app
+        run: docker compose up -d --build
+
+      - name: Wait
+        run: sleep 5
+
+      - name: Test backend
+        run: curl --fail http://localhost:3000/api/users
+
+      - name: Test frontend
+        run: curl --fail http://localhost:8080
+
+      - name: Stop
+        run: docker compose down
