@@ -1,0 +1,40 @@
+name : Deploy
+
+on:
+  workflow_run:
+    workflows:
+      - Simple CI/CD
+    types:   
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+      - uses: actions/checkout@v3
+
+      -name: Deploy via SSH
+       uses: appleboy/ssh-action@v1
+
+       with:
+         host: $
+{{ secrets.SSH_DEVHUB_HOST }}
+         username: $
+{{ secrets.SSH_DEVHUB_USER }}
+         key: $
+{{ secrets.SSH_DEVHUB }}
+
+          script: |
+            cd ~/projects/Devhub
+
+            git pull origin main
+
+            docker compose down
+
+            docker compose up -d --build
+
+            docker ps
