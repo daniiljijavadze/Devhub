@@ -33,7 +33,13 @@ jobs:
             echo "Attempt $i failed, retrying in 2s..."
             sleep 2
           done
-
+          echo "Waiting for frontend..."
+          for i in {1..15}; do
+            curl -s http://localhost:8080 && break
+            echo "Attempt $i failed, retrying in 2s..."
+            sleep 2
+           done
+              
       - name: Test backend
         run: curl --fail http://localhost:3000/api/users
 
